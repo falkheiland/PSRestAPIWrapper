@@ -72,7 +72,9 @@ function Write-PSRAWFunctionFromTemplate
         $Verb = 'Remove'
       }
     }
-    $FunctionName = '{0}-{1}{2}' -f $Verb, $FunctionPrefix, (Get-Culture).TextInfo.ToTitleCase($Tier2)
+    # Set noun Plural to Singular
+    $Noun = ((Get-Culture).TextInfo.ToTitleCase($Tier2) -replace 's$', '' -replace 'sse$', 'ss')
+    $FunctionName = '{0}-{1}{2}' -f $Verb, $FunctionPrefix, $Noun
   }
   
   process
@@ -175,7 +177,9 @@ function Write-PSRAWFunctionFromTemplate
               }
               elseif ($line -match '__type__')
               {
-                $line -replace '__type__', (Get-Culture).TextInfo.ToTitleCase($OtherParam.Type)
+                # [Integer] -> [Int]
+                $Type = (Get-Culture).TextInfo.ToTitleCase($OtherParam.Type) -replace 'eger$', ''
+                $line -replace '__type__', $Type
               }
               elseif (($line -match '__otherparams__') -and ($i -lt $OtherParams.Count))
               {
