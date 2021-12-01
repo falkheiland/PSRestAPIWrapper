@@ -106,6 +106,11 @@
       $Tier1 = $_.Group[0].Tier1
       $Tier2 = $_.Group[0].Tier2
 
+      $OtherParams = foreach ($Group in $_.Group[0])
+      {
+        $Group.Parameters
+      }
+
       $SwitchParams = foreach ($Group in $_.Group)
       {
         if ($Group.Endpoint -match '.*{(?<IDParameter>\w.*)}$')
