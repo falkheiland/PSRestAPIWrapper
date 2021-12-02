@@ -84,63 +84,65 @@
 
     }
 
-    $PSGetGroupedEndPointObjColl = ($PSGetEndPointObjColl | Group-Object -Property Tier1, Tier2 | Select-Object -Property Group).Group | ForEach-Object {
+    $PSGetGroupedEndPointObjColl = ($PSGetEndPointObjColl |
+        Group-Object -Property Tier1, Tier2 | Select-Object -Property Group).Group | ForEach-Object {
 
-      [PSCustomObject]@{
-        EndPoint         = $_.EndPoint
-        BaseUrl          = $_.BaseUrl
-        Tier1            = $_.Tier1
-        Tier2            = $_.Tier2
-        FunctionNameVerb = $_.FunctionNameVerb
-        FunctionName     = $_.FunctionName
-        Tags             = $_.Tags
-        Summary          = $_.Summary
-        Parameters       = $_.Parameters
-        Reponses         = $_.Reponses
-      }
-
-    }
-
-    $PSGetFunctionNameGroupedEndPointObjColl = $PSGetGroupedEndPointObjColl | Group-Object -Property FunctionName | ForEach-Object {
-
-      $Tier1 = $_.Group[0].Tier1
-      $Tier2 = $_.Group[0].Tier2
-
-      $OtherParams = foreach ($Group in $_.Group[0])
-      {
-        $Group.Parameters
-      }
-
-      $SwitchParams = foreach ($Group in $_.Group)
-      {
-        if ($Group.Endpoint -match '.*{(?<IDParameter>\w.*)}$')
-        {
-          $Name = $Matches.IDParameter
-        }
-        elseif ($Group.Endpoint -match '.*{\w.*}\/(?<SwitchParameter>\w.*)$')
-        {
-          $Name = $Matches.SwitchParameter -replace ('/')
-        }
-        elseif ($Group.Endpoint -match ('^{0}\/{1}\/{2}$' -f $BaseUrl, $Tier1, $Tier2))
-        {
-          $Name = 'NoParams'
-        }
         [PSCustomObject]@{
-          Name    = $Name
-          Summary = $Group.Summary
+          EndPoint         = $_.EndPoint
+          BaseUrl          = $_.BaseUrl
+          Tier1            = $_.Tier1
+          Tier2            = $_.Tier2
+          FunctionNameVerb = $_.FunctionNameVerb
+          FunctionName     = $_.FunctionName
+          Tags             = $_.Tags
+          Summary          = $_.Summary
+          Parameters       = $_.Parameters
+          Reponses         = $_.Reponses
         }
+
       }
 
-      [PSCustomObject]@{
-        FunctionName     = $_.Name
-        OtherParams      = $OtherParams
-        SwitchParams     = $SwitchParams
-        FunctionNameVerb = $_.Group[0].FunctionNameVerb
-        BaseUrl          = $BaseUrl
-        Tier1            = $_.Group[0].Tier1
-        Tier2            = $_.Group[0].Tier2
+    $PSGetFunctionNameGroupedEndPointObjColl = $PSGetGroupedEndPointObjColl |
+      Group-Object -Property FunctionName | ForEach-Object {
+
+        $Tier1 = $_.Group[0].Tier1
+        $Tier2 = $_.Group[0].Tier2
+
+        $OtherParams = foreach ($Group in $_.Group[0])
+        {
+          $Group.Parameters
+        }
+
+        $SwitchParams = foreach ($Group in $_.Group)
+        {
+          if ($Group.Endpoint -match '.*{(?<IDParameter>\w.*)}$')
+          {
+            $Name = $Matches.IDParameter
+          }
+          elseif ($Group.Endpoint -match '.*{\w.*}\/(?<SwitchParameter>\w.*)$')
+          {
+            $Name = $Matches.SwitchParameter -replace ('/')
+          }
+          elseif ($Group.Endpoint -match ('^{0}\/{1}\/{2}$' -f $BaseUrl, $Tier1, $Tier2))
+          {
+            $Name = 'NoParams'
+          }
+          [PSCustomObject]@{
+            Name    = $Name
+            Summary = $Group.Summary
+          }
+        }
+
+        [PSCustomObject]@{
+          FunctionName     = $_.Name
+          OtherParams      = $OtherParams
+          SwitchParams     = $SwitchParams
+          FunctionNameVerb = $_.Group[0].FunctionNameVerb
+          BaseUrl          = $BaseUrl
+          Tier1            = $_.Group[0].Tier1
+          Tier2            = $_.Group[0].Tier2
+        }
       }
-    }
 
     $PSGetFunctionNameGroupedEndPointObjColl
   }

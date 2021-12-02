@@ -87,13 +87,56 @@ function Write-PSRAWFunctionFromTemplate
       {
         $line -replace '__functionname__', $FunctionName
       }
+      elseif ($line -match '##__(?<RegionParam>\w+)__##')
+      {
+        $RegionParam = $Matches.RegionParam
+      }
+      elseif ($line -match '__synopsis__')
+      {
+        $line -replace '__synopsis__', ('{0} {1}' -f $Verb, ((Get-Culture).TextInfo.ToTitleCase($Tier2)))
+      }
+      elseif ($line -match '__longdescription__')
+      {
+        $line -replace '__longdescription__', ('{0} {1}' -f $Verb, ((Get-Culture).TextInfo.ToTitleCase($Tier2)))
+      }
+      elseif ($RegionParam -eq 'parametername')
+      {
+        if ($SwitchParams)
+        {
+          if ($line -notmatch ('##end__parametername__##' -f $RegionParam))
+          {
+            $LineColl += ('{0};' -f $line)
+          }
+          elseif ($line -match ('##end__parametername__##' -f $RegionParam))
+          {
+            $SwitchParams.ForEach{
+              ($LineColl -split ';')[0] -replace '__parametername__', (Get-Culture).TextInfo.ToTitleCase($_.name)
+              ($LineColl -split ';')[1] -replace '__parameterdescription__', (Get-Culture).TextInfo.ToTitleCase($_.Summary)
+              Out-String
+            }
+            $RegionParam = $null
+            $LineColl = $null
+            #$LineColl = ''
+          }
+        }
+        else
+        {
+          if ($line -notmatch ('##end__parametername__##' -f $RegionParam))
+          {
+          }
+          elseif ($line -match ('##end__parametername__##' -f $RegionParam))
+          {
+            $RegionParam = $null
+          }
+        }
+      }
       elseif ($line -match '\[CmdletBinding\(')
       {
         $line -replace '__noparams__', $NoParams
       }
-      elseif ($line -match '<#__(?<RegionParam>\w+)__#>')
+      elseif ($line -match '\[CmdletBinding\(')
       {
-        $RegionParam = $Matches.RegionParam
+        $line -replace '__noparams__', $NoParams
       }
       elseif ($RegionParam -eq 'ids')
       {
@@ -106,7 +149,8 @@ function Write-PSRAWFunctionFromTemplate
           elseif ($line -match '__switchparams__')
           {        
             $SwitchParams.ForEach{
-              $line -replace '__switchparams__', (Get-Culture).TextInfo.ToTitleCase($_)
+              #$line -replace '__switchparams__', (Get-Culture).TextInfo.ToTitleCase($_)
+              $line -replace '__switchparams__', (Get-Culture).TextInfo.ToTitleCase($_.name)
             }
           }
         }
@@ -114,7 +158,7 @@ function Write-PSRAWFunctionFromTemplate
         {
           $line -replace '__ids__', (Get-Culture).TextInfo.ToTitleCase($Ids)
         }
-        elseif ($line -match ('<#end__ids__#>' -f $RegionParam))
+        elseif ($line -match ('##end__ids__##' -f $RegionParam))
         {
           $RegionParam = $null
         }
@@ -127,14 +171,15 @@ function Write-PSRAWFunctionFromTemplate
       {
         if ($SwitchParams)
         {
-          if ($line -notmatch ('<#end__switchparams__#>' -f $RegionParam))
+          if ($line -notmatch ('##end__switchparams__##' -f $RegionParam))
           {
             $LineColl += ('{0};' -f $line)
           }
-          elseif ($line -match ('<#end__switchparams__#>' -f $RegionParam))
+          elseif ($line -match ('##end__switchparams__##' -f $RegionParam))
           {
             $SwitchParams.ForEach{
-              $LineColl -split ';' -replace '__switchparams__', (Get-Culture).TextInfo.ToTitleCase($_)
+              #$LineColl -split ';' -replace '__switchparams__', (Get-Culture).TextInfo.ToTitleCase($_)
+              $LineColl -split ';' -replace '__switchparams__', (Get-Culture).TextInfo.ToTitleCase($_.name)
             }
             $RegionParam = $null
             $LineColl = $null
@@ -143,10 +188,10 @@ function Write-PSRAWFunctionFromTemplate
         }
         else
         {
-          if ($line -notmatch ('<#end__switchparams__#>' -f $RegionParam))
+          if ($line -notmatch ('##end__switchparams__##' -f $RegionParam))
           {
           }
-          elseif ($line -match ('<#end__switchparams__#>' -f $RegionParam))
+          elseif ($line -match ('##end__switchparams__##' -f $RegionParam))
           {
             $RegionParam = $null
           }
@@ -155,11 +200,11 @@ function Write-PSRAWFunctionFromTemplate
       elseif ($RegionParam -eq 'otherparams')
       {
         $i = 1
-        if ($line -notmatch ('<#end__otherparams__#>' -f $RegionParam))
+        if ($line -notmatch ('##end__otherparams__##' -f $RegionParam))
         {
           $LineColl += ('{0};' -f $line)
         }
-        elseif ($line -match ('<#end__otherparams__#>' -f $RegionParam))
+        elseif ($line -match ('##end__otherparams__##' -f $RegionParam))
         {
           $OtherParams.GetEnumerator().ForEach{
             $OtherParam = $_
@@ -168,7 +213,8 @@ function Write-PSRAWFunctionFromTemplate
               if ($line -match '__switchparams__')
               {
                 $SwitchParams.GetEnumerator().ForEach{
-                  $line -replace '__switchparams__', (Get-Culture).TextInfo.ToTitleCase($_)
+                  #$line -replace '__switchparams__', (Get-Culture).TextInfo.ToTitleCase($_)
+                  $line -replace '__switchparams__', (Get-Culture).TextInfo.ToTitleCase($_.name)
                 }
               }
               elseif ($line -match '__noparams__')
