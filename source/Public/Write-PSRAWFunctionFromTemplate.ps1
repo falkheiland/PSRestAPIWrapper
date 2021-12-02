@@ -30,7 +30,6 @@ function Write-PSRAWFunctionFromTemplate
     [String]
     $PGetFunctionString,
 
-    #[Parameter(Mandatory)]
     [array]
     $SwitchParams,
 
@@ -116,27 +115,8 @@ function Write-PSRAWFunctionFromTemplate
             }
             $RegionParam = $null
             $LineColl = $null
-            #$LineColl = ''
           }
         }
-        # elseif ($OtherParams) #if ($OtherParams)
-        # {
-        #   if ($line -notmatch ('##end__parametername__##' -f $RegionParam))
-        #   {
-        #     $LineColl += ('{0};' -f $line)
-        #   }
-        #   elseif ($line -match ('##end__parametername__##' -f $RegionParam))
-        #   {
-        #     $OtherParams.ForEach{
-        #       ($LineColl -split ';')[0] -replace '__parametername__', (Get-Culture).TextInfo.ToTitleCase($_.name)
-        #       ($LineColl -split ';')[1] -replace '__parameterdescription__', (Get-Culture).TextInfo.ToTitleCase($_.description)
-        #       Out-String
-        #     }
-        #     #$RegionParam = $null
-        #     $LineColl = $null
-        #     #$LineColl = ''
-        #   }
-        # }
         else
         {
           if ($line -notmatch ('##end__parametername__##' -f $RegionParam))
@@ -167,7 +147,6 @@ function Write-PSRAWFunctionFromTemplate
           elseif ($line -match '__switchparams__')
           {        
             $SwitchParams.ForEach{
-              #$line -replace '__switchparams__', (Get-Culture).TextInfo.ToTitleCase($_)
               $line -replace '__switchparams__', (Get-Culture).TextInfo.ToTitleCase($_.name)
             }
           }
@@ -196,8 +175,6 @@ function Write-PSRAWFunctionFromTemplate
           elseif ($line -match ('##end__switchparams__##' -f $RegionParam))
           {
             $SwitchParams.ForEach{
-              #$LineColl -split ';' -replace '__switchparams__', (Get-Culture).TextInfo.ToTitleCase($_)
-              #$LineColl -split ';' -replace '__switchparams__', (Get-Culture).TextInfo.ToTitleCase($_.name)
               ($LineColl -split ';')[0] -replace '__switchparams__', (Get-Culture).TextInfo.ToTitleCase($_.name)
               ($LineColl -split ';')[1] -replace '__type__', (Get-Culture).TextInfo.ToTitleCase($_.type)
               ($LineColl -split ';')[2] -replace '__switchparams__', (Get-Culture).TextInfo.ToTitleCase($_.name)
@@ -205,7 +182,6 @@ function Write-PSRAWFunctionFromTemplate
             }
             $RegionParam = $null
             $LineColl = $null
-            #$LineColl = ''
           }
         }
         else
@@ -235,7 +211,6 @@ function Write-PSRAWFunctionFromTemplate
               if ($line -match '__switchparams__')
               {
                 $SwitchParams.GetEnumerator().ForEach{
-                  #$line -replace '__switchparams__', (Get-Culture).TextInfo.ToTitleCase($_)
                   $line -replace '__switchparams__', (Get-Culture).TextInfo.ToTitleCase($_.name)
                 }
               }

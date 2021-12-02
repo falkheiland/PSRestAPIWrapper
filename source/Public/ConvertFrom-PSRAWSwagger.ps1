@@ -5,12 +5,10 @@
     [Parameter(Mandatory, ValueFromPipeline)]
     $Swagger,
 
-    # FunctionNameVerb = 'Get'
     [Parameter(Mandatory)]
     [String]
     $FunctionNameVerb,
 
-    # FunctionNamePrefix = 'PF'
     [Parameter(Mandatory)]
     [String]
     $FunctionNamePrefix
