@@ -101,7 +101,7 @@ function Write-PSRAWFunctionFromTemplate
       }
       elseif ($RegionParam -eq 'parametername')
       {
-        if ($SwitchParams)
+        if (($SwitchParams) -or ($OtherParams))
         {
           if ($line -notmatch ('##end__parametername__##' -f $RegionParam))
           {
@@ -109,9 +109,9 @@ function Write-PSRAWFunctionFromTemplate
           }
           elseif ($line -match ('##end__parametername__##' -f $RegionParam))
           {
-            $SwitchParams.ForEach{
+            ($SwitchParams + $OtherParams).ForEach{
               ($LineColl -split ';')[0] -replace '__parametername__', (Get-Culture).TextInfo.ToTitleCase($_.name)
-              ($LineColl -split ';')[1] -replace '__parameterdescription__', (Get-Culture).TextInfo.ToTitleCase($_.Summary)
+              ($LineColl -split ';')[1] -replace '__parameterdescription__', (Get-Culture).TextInfo.ToTitleCase($_.Description)
               Out-String
             }
             $RegionParam = $null
@@ -119,6 +119,24 @@ function Write-PSRAWFunctionFromTemplate
             #$LineColl = ''
           }
         }
+        # elseif ($OtherParams) #if ($OtherParams)
+        # {
+        #   if ($line -notmatch ('##end__parametername__##' -f $RegionParam))
+        #   {
+        #     $LineColl += ('{0};' -f $line)
+        #   }
+        #   elseif ($line -match ('##end__parametername__##' -f $RegionParam))
+        #   {
+        #     $OtherParams.ForEach{
+        #       ($LineColl -split ';')[0] -replace '__parametername__', (Get-Culture).TextInfo.ToTitleCase($_.name)
+        #       ($LineColl -split ';')[1] -replace '__parameterdescription__', (Get-Culture).TextInfo.ToTitleCase($_.description)
+        #       Out-String
+        #     }
+        #     #$RegionParam = $null
+        #     $LineColl = $null
+        #     #$LineColl = ''
+        #   }
+        # }
         else
         {
           if ($line -notmatch ('##end__parametername__##' -f $RegionParam))
@@ -179,7 +197,11 @@ function Write-PSRAWFunctionFromTemplate
           {
             $SwitchParams.ForEach{
               #$LineColl -split ';' -replace '__switchparams__', (Get-Culture).TextInfo.ToTitleCase($_)
-              $LineColl -split ';' -replace '__switchparams__', (Get-Culture).TextInfo.ToTitleCase($_.name)
+              #$LineColl -split ';' -replace '__switchparams__', (Get-Culture).TextInfo.ToTitleCase($_.name)
+              ($LineColl -split ';')[0] -replace '__switchparams__', (Get-Culture).TextInfo.ToTitleCase($_.name)
+              ($LineColl -split ';')[1] -replace '__type__', (Get-Culture).TextInfo.ToTitleCase($_.type)
+              ($LineColl -split ';')[2] -replace '__switchparams__', (Get-Culture).TextInfo.ToTitleCase($_.name)
+              Out-String
             }
             $RegionParam = $null
             $LineColl = $null
