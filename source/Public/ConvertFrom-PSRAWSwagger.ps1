@@ -44,13 +44,13 @@
     (($_ | Select-Object -Property Count).Count) -EQ $MaxNumberGroupedEndpoint
     } | Where-Object -Property Name | Select-Object -Property Name, Count
 
-    $EndPoint0Spitted = ($EndPointColl.Name[0] -split '/')
+    $EndPoint0Splitted = ($EndPointColl.Name[0] -split '/')
     $i = 0
-    while ($i -lt ($EndPoint0Spitted).Count)
+    while ($i -lt ($EndPoint0Splitted).Count)
     {
-      if ($EndPoint0Spitted[$i] -in $EqualMaxNumberGroupedEndpointColl.Name )
+      if ($EndPoint0Splitted[$i] -in $EqualMaxNumberGroupedEndpointColl.Name )
       {
-        $BaseURL = '{0}/{1}' -f $BaseURL, $EndPoint0Spitted[$i]
+        $BaseURL = '{0}/{1}' -f $BaseURL, $EndPoint0Splitted[$i]
       }
       $i++
     }
